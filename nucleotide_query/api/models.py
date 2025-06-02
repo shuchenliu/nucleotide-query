@@ -9,7 +9,7 @@ class Match(models.Model):
 
     Matches are associated with one or more SearchTerms through a many-to-many relationship.
     """
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     start = models.IntegerField()
     end = models.IntegerField()
 
@@ -30,7 +30,7 @@ class SearchTerm(models.Model):
     0 or more matched results
     """
 
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     pattern = models.TextField()
     matches = models.ManyToManyField(Match, related_name="search_terms")
 
