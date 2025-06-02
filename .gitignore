@@ -9,3 +9,7 @@
 
 # reference data
 **/reference.xml
+
+
+# dev scripts
+test_**.py
