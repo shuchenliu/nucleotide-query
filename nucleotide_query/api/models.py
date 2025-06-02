@@ -2,6 +2,37 @@ import uuid
 from django.db import models
 
 
+
+class Sequence(models.Model):
+    """
+    Sequence models stores nucleotide sequences. We are dealing with relatively short sequence here so
+    in database persistence and retrieval should be ok
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    # fields derived from request payload
+    nih_db = models.TextField()
+    nih_id = models.TextField()
+    type = models.TextField()
+
+    # fields derived from response payload
+    seqtype = models.TextField()
+    accver = models.TextField()
+    taxid = models.TextField()
+    orgname = models.TextField()
+    defline = models.TextField()
+    length = models.IntegerField()
+    sequence = models.TextField()
+
+    def __str__(self):
+        return self.defline
+
+    class Meta:
+        # Ensure only one record exists per NIH DB query for a given data type
+        constraints = [
+            models.UniqueConstraint(fields=["nih_db", "nih_id", "type"], name="unique_sequence_data")
+        ]
+
 class Match(models.Model):
     """
     Match models represents match results. Each match contains a start position and an end position
@@ -12,6 +43,7 @@ class Match(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     start = models.IntegerField()
     end = models.IntegerField()
+    sequence = models.ForeignKey(Sequence, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['start', 'end']
@@ -33,6 +65,7 @@ class SearchTerm(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     pattern = models.TextField()
     matches = models.ManyToManyField(Match, related_name="search_terms")
+    sequence = models.ForeignKey(Sequence, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.pattern
