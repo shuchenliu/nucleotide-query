@@ -12,9 +12,15 @@ class GenomeReference:
     sequence_length: int
 
     @staticmethod
-    def save_xml(xml: bytes) -> None:
+    def get_xml_path() -> str:
         cur_absolute_dir = Path(__file__).resolve().parent
-        output_path = os.path.join(cur_absolute_dir, "data", "reference.xml")
+        file_path = os.path.join(cur_absolute_dir, "data", "reference.xml")
+
+        return file_path
+
+    @classmethod
+    def save_xml(cls, xml: bytes) -> None:
+        output_path = cls.get_xml_path()
 
         # relatively small data we are requesting and saving
         # no streaming or async write needed
