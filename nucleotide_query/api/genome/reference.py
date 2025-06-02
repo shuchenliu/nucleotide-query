@@ -13,6 +13,11 @@ class GenomeReference:
 
     @staticmethod
     def _get_query_data() -> dict:
+        """
+        Provides keys for querying the Sequence model based on NIH API query
+
+        :return: dictionary with fields, in combination should be unique to Sequence model
+        """
         query_data = {
             "nih_db": PARAMS['db'],
             "nih_id": PARAMS['id'],
@@ -23,6 +28,12 @@ class GenomeReference:
 
     @classmethod
     def _populate_variables(cls, sequence_data) -> None:
+        """
+        Populates class variables for in-memory use later
+
+        :param sequence_data: a dictionary with at least 'orgname', 'length', and 'sequence' fields
+        """
+
         # populate to singleton instance's variables
         cls.name = sequence_data['orgname']
         cls.sequence_length = sequence_data['length']
@@ -30,6 +41,12 @@ class GenomeReference:
 
     @classmethod
     def _parse_and_save_sequence_data(cls, xml: bytes) -> None:
+        """
+        Parses XML data and save to database
+
+        :param xml: byte data of XML, fetched from NIH API
+        """
+
         prefix = "TSeq"
         root = ET.fromstring(xml)
 
@@ -52,7 +69,11 @@ class GenomeReference:
 
 
     @classmethod
-    def _load_from_db(cls):
+    def _load_from_db(cls) -> None:
+        """
+        Loads sequence data from database into memory
+        """
+
         query_data = cls._get_query_data()
 
         # query data with the unique combination
@@ -64,8 +85,7 @@ class GenomeReference:
     @classmethod
     def _remote_query(cls) -> None:
         """
-        Query NIH server for sequence. It saves queried data to a local file
-        and pass data to parser
+        Query NIH server for sequence. It passed data for parsing and saving to database
 
         :raises requests.exceptions.HTTPError: if encountering 400, 500 response
         :raises AssertionError: if the response is not of type application/xml or text/xml
@@ -83,6 +103,7 @@ class GenomeReference:
         """
         Load sequence data into memory from the local DB, or start remote query if no such file exists
         """
+
         try:
             cls._load_from_db()
         except Sequence.DoesNotExist:
@@ -94,6 +115,7 @@ class GenomeReference:
         Get sequence string
         :return: sequence string
         """
+
         if cls.sequence is None:
             raise Exception("No sequence available")
 
