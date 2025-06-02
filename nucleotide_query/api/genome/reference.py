@@ -49,6 +49,29 @@ class GenomeReference:
         cls.parse_xml(response.content)
 
 
+    @classmethod
+    def prepare(cls) -> None:
+        input_path = cls.get_xml_path()
+
+        # try loading locally and fall back to
+        # remote loading if needed
+        try:
+            with open(input_path, "rb") as f:
+                contents = f.read()
+                cls.parse_xml(contents)
+        except FileNotFoundError:
+            cls.remote_query()
+
+
+    @classmethod
+    def get(cls) -> str:
+        if cls.sequence is None:
+            raise Exception("No sequence available")
+
+        return cls.sequence
+
+
+
 
 
 
