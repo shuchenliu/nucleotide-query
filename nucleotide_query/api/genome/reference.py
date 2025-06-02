@@ -1,12 +1,9 @@
-import os
 import requests
-from pathlib import Path
 import xml.etree.ElementTree as ET
 
-from nucleotide_query.api.genome.constants import URL, HEADERS, PARAMS
+from nucleotide_query.api.genome.constants import URL, HEADERS, PARAMS, SEQUENCE_DATA_FIELDS
+from nucleotide_query.api.models import Sequence
 
-
-# todo maybe change file saving to DB
 
 class GenomeReference:
 
@@ -15,41 +12,54 @@ class GenomeReference:
     sequence_length: int = None
 
     @staticmethod
-    def _get_xml_path() -> str:
-        """
-        Provide a consistent path for xml file.
-        :return: a string representing the path that points to the reference xml file
-        """
-        cur_absolute_dir = Path(__file__).resolve().parent
-        file_path = os.path.join(cur_absolute_dir, "data", "reference.xml")
+    def _get_query_data() -> dict:
+        query_data = {
+            "nih_db": PARAMS['db'],
+            "nih_id": PARAMS['id'],
+            "type": PARAMS['rettype'],
+        }
 
-        return file_path
-
-    @classmethod
-    def _save_xml(cls, xml: bytes) -> None:
-        """
-        Write the xml file to a pre-defined path.
-        :param xml: byte data from an HTTP request
-        """
-        output_path = cls._get_xml_path()
-
-        # relatively small data we are requesting and saving
-        # no streaming or async write needed
-        with open(output_path, "wb") as f:
-            f.write(xml)
+        return query_data
 
     @classmethod
-    def _parse_xml(cls, xml: bytes) -> None:
-        """
-        Parse xml data and populate class variables for reference
-        :param xml: byte data either read from a local file or from an HTTP request
-        """
+    def _populate_variables(cls, sequence_data) -> None:
+        # populate to singleton instance's variables
+        cls.name = sequence_data['orgname']
+        cls.sequence_length = sequence_data['length']
+        cls.sequence = sequence_data['sequence']
+
+    @classmethod
+    def _parse_and_save_sequence_data(cls, xml: bytes) -> None:
         prefix = "TSeq"
         root = ET.fromstring(xml)
-        cls.name = root.find(f"{prefix}/{prefix}_orgname").text
-        cls.sequence_length = int(root.find(f"{prefix}/{prefix}_length").text)
-        cls.sequence = root.find(f"{prefix}/{prefix}_sequence").text
 
+        # query data are also fields of sequence data
+        sequence_data = cls._get_query_data()
+
+        # load data according to pre-defined fields
+        for field in SEQUENCE_DATA_FIELDS:
+            raw_text = root.find(f"{prefix}/{prefix}_{field}").text
+            if field == 'length':
+                sequence_data[field] = int(raw_text)
+            else:
+                sequence_data[field] = raw_text
+
+        # save to database
+        Sequence.objects.create(**sequence_data)
+
+        # populate to singleton instance's variables
+        cls._populate_variables(sequence_data)
+
+
+    @classmethod
+    def _load_from_db(cls):
+        query_data = cls._get_query_data()
+
+        # query data with the unique combination
+        sequence_data = Sequence.objects.values('orgname', 'length', 'sequence').get(**query_data)
+
+        # populate to singleton instance's variables
+        cls._populate_variables(sequence_data)
 
     @classmethod
     def _remote_query(cls) -> None:
@@ -62,31 +72,21 @@ class GenomeReference:
         """
         response = requests.get(URL, headers=HEADERS, params=PARAMS)
 
-        # we check for valid responses with XML data, and save XML data locally
+        # we check for valid responses with XML data, and start data processing
         response.raise_for_status()
         assert "xml" in response.headers.get("Content-Type", "").lower()
-        cls._save_xml(response.content)
-
-        # parse xml
-        cls._parse_xml(response.content)
+        cls._parse_and_save_sequence_data(response.content)
 
 
     @classmethod
     def prepare(cls) -> None:
         """
-        Load sequence data into memory from the local file, or start remote query if no such file exists
+        Load sequence data into memory from the local DB, or start remote query if no such file exists
         """
-        input_path = cls._get_xml_path()
-
-        # try loading locally and fall back to
-        # remote loading if needed
         try:
-            with open(input_path, "rb") as f:
-                contents = f.read()
-                cls._parse_xml(contents)
-        except FileNotFoundError:
+            cls._load_from_db()
+        except Sequence.DoesNotExist:
             cls._remote_query()
-
 
     @classmethod
     def get(cls) -> str:

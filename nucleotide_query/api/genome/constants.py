@@ -8,3 +8,13 @@ PARAMS = {
 
 # emphasize expected data type
 HEADERS = {"accept": "text/xml"}
+
+SEQUENCE_DATA_FIELDS = [
+    'seqtype',
+    'accver',
+    'taxid',
+    'orgname',
+    'defline',
+    'length'
+    'sequence'
+]
