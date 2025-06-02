@@ -1,7 +1,8 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
+from rest_framework.validators import UniqueTogetherValidator
 
 from nucleotide_query.api.models import Match, SearchTerm
+from nucleotide_query.api.validators import validate_search_pattern
 
 
 class MatchSerializer(serializers.ModelSerializer):
@@ -18,3 +19,10 @@ class MatchSerializer(serializers.ModelSerializer):
             )
         ]
 
+
+class SearchTermSerializer(serializers.ModelSerializer):
+    pattern = serializers.CharField(validators=[validate_search_pattern])
+
+    class Meta:
+        model = SearchTerm
+        fields = ['id', 'pattern']
