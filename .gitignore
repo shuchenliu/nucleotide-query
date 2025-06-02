@@ -6,3 +6,6 @@
 
 # sqlite file
 *.sqlite3
+
+# reference data
+**/reference.xml
