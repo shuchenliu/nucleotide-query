@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from nucleotide_query.api.models import Match, SearchTerm
-from nucleotide_query.api.validators import validate_search_pattern
+from api.models import Match, SearchTerm
+from api.validators import validate_search_pattern
 
 
 class MatchSerializer(serializers.ModelSerializer):

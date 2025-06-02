@@ -1,8 +1,8 @@
 import requests
 import xml.etree.ElementTree as ET
 
-from nucleotide_query.api.genome.constants import URL, HEADERS, PARAMS, SEQUENCE_DATA_FIELDS
-from nucleotide_query.api.models import Sequence
+from api.genome.constants import URL, HEADERS, PARAMS, SEQUENCE_DATA_FIELDS
+from api.models import Sequence
 
 
 class GenomeReference:
