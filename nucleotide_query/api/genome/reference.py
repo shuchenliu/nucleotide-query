@@ -20,11 +20,6 @@ class GenomeReference:
     sequence: str
     sequence_length: int
 
-    @classmethod
-    def parse_xml(cls, xml: bytes) -> None:
-        pass
-
-
     @staticmethod
     def save_xml(xml: bytes) -> None:
         cur_absolute_dir = Path(__file__).resolve().parent
@@ -34,6 +29,14 @@ class GenomeReference:
         # no streaming or async write needed
         with open(output_path, "wb") as f:
             f.write(xml)
+
+    @classmethod
+    def parse_xml(cls, xml: bytes) -> None:
+        prefix = "TSeq"
+        root = ET.fromstring(xml)
+        cls.name = root.find(f"{prefix}/{prefix}_orgname").text
+        cls.sequence_length = int(root.find(f"{prefix}/{prefix}_length").text)
+        cls.sequence = root.find(f"{prefix}/{prefix}_sequence").text
 
 
     @classmethod
