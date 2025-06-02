@@ -38,4 +38,12 @@ class SearchTerm(models.Model):
         return self.pattern
 
 class Search(models.Model):
+
+    """
+    todo:
+
+    Search model is established in case we want to retrieve most frequent/recent searches.
+    Might be good for class-based views with standard CRUD ops, mostly just listing
+    """
+
     pass
