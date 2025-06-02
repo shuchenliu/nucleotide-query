@@ -55,11 +55,15 @@ class GenomeReference:
 
         # load data according to pre-defined fields
         for field in SEQUENCE_DATA_FIELDS:
-            raw_text = root.find(f"{prefix}/{prefix}_{field}").text
+            node = root.find(f"{prefix}/{prefix}_{field}")
             if field == 'length':
-                sequence_data[field] = int(raw_text)
+                value = int(node.text)
+            elif field == 'seqtype':
+                value = node.get('value')
             else:
-                sequence_data[field] = raw_text
+                value = node.text
+
+            sequence_data[field] = value
 
         # save to database
         Sequence.objects.create(**sequence_data)
@@ -105,8 +109,10 @@ class GenomeReference:
         """
 
         try:
+            print("Loading reference sequence from local DB")
             cls._load_from_db()
         except Sequence.DoesNotExist:
+            print("Failed to load from DB. Querying NIH server")
             cls._remote_query()
 
     @classmethod
