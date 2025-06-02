@@ -15,6 +15,6 @@ SEQUENCE_DATA_FIELDS = [
     'taxid',
     'orgname',
     'defline',
-    'length'
+    'length',
     'sequence'
 ]
