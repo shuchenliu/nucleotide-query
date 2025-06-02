@@ -5,6 +5,9 @@ import xml.etree.ElementTree as ET
 
 from nucleotide_query.api.genome.constants import URL, HEADERS, PARAMS
 
+
+# todo maybe change file saving to DB
+
 class GenomeReference:
 
     name: str = None
