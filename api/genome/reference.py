@@ -115,6 +115,9 @@ class GenomeReference:
             print("Failed to load from DB. Querying NIH server")
             cls._remote_query()
 
+        print(f"Loaded. \nSequence name: {cls.name}, \nlength: {cls.sequence_length}")
+
+
     @classmethod
     def get(cls) -> str:
         """
