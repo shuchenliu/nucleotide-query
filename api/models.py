@@ -63,7 +63,7 @@ class SearchTerm(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    pattern = models.TextField()
+    pattern = models.TextField(unique=True)
     matches = models.ManyToManyField(Match, related_name="search_terms")
     sequence = models.ForeignKey(Sequence, on_delete=models.CASCADE)
 
