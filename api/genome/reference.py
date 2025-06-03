@@ -7,6 +7,7 @@ from api.models import Sequence
 
 class GenomeReference:
 
+    sequence_id = None
     name: str = None
     sequence: str = None
     sequence_length: int = None
@@ -35,6 +36,7 @@ class GenomeReference:
         """
 
         # populate to singleton instance's variables
+        cls.sequence_id = sequence_data['id']
         cls.name = sequence_data['orgname']
         cls.sequence_length = sequence_data['length']
         cls.sequence = sequence_data['sequence']
@@ -66,10 +68,13 @@ class GenomeReference:
             sequence_data[field] = value
 
         # save to database
-        Sequence.objects.create(**sequence_data)
+        sequence_record = Sequence.objects.create(**sequence_data)
 
         # populate to singleton instance's variables
-        cls._populate_variables(sequence_data)
+        cls._populate_variables({
+            **sequence_data,
+            id: sequence_record.id,
+        })
 
 
     @classmethod
@@ -81,7 +86,7 @@ class GenomeReference:
         query_data = cls._get_query_data()
 
         # query data with the unique combination
-        sequence_data = Sequence.objects.values('orgname', 'length', 'sequence').get(**query_data)
+        sequence_data = Sequence.objects.values('id','orgname', 'length', 'sequence').get(**query_data)
 
         # populate to singleton instance's variables
         cls._populate_variables(sequence_data)
@@ -115,7 +120,7 @@ class GenomeReference:
             print("Failed to load from DB. Querying NIH server")
             cls._remote_query()
 
-        print(f"Loaded. \nSequence name: {cls.name}, \nlength: {cls.sequence_length}")
+        print(f"Loaded. \nSequence id:{cls.sequence_id} \nSequence name: {cls.name}, \nlength: {cls.sequence_length}")
 
 
     @classmethod
