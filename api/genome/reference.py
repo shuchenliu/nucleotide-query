@@ -124,16 +124,17 @@ class GenomeReference:
 
 
     @classmethod
-    def get(cls) -> str:
+    def get(cls) -> (str, str):
         """
-        Get sequence string
-        :return: sequence string
+        Get sequence and its id
+
+        :return: tuple of sequence string and id in db
         """
 
         if cls.sequence is None:
             raise Exception("No sequence available")
 
-        return cls.sequence
+        return cls.sequence, cls.sequence_id
 
 
 
