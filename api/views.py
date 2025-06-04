@@ -1,13 +1,14 @@
 import uuid
 
 from rest_framework import status
+from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.genome.reference import GenomeReference
-from api.models import SearchTerm, Match
-from api.serializers import SearchTermSerializer, MatchSerializer
+from api.models import SearchTerm, Match, Sequence
+from api.serializers import SearchTermSerializer, MatchSerializer, SequenceSerializer, SequenceListSerializer
 
 import re2 as re
 
@@ -102,6 +103,15 @@ class QueryView(APIView):
         if batch:
             yield batch
 
+
+
+class SequenceListView(ListAPIView):
+    queryset = Sequence.objects.all()
+    serializer_class = SequenceListSerializer
+
+class SequenceDetailView(RetrieveAPIView):
+    queryset = Sequence.objects.all()
+    serializer_class = SequenceSerializer
 
 
 
