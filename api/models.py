@@ -82,5 +82,9 @@ class Search(models.Model):
     Search model is established in case we want to retrieve most frequent/recent searches.
     Might be good for class-based views with standard CRUD ops, mostly just listing
     """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    search = models.ForeignKey(SearchTerm, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    pass
+    class Meta:
+        ordering = ['created_at']
