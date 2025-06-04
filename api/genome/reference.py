@@ -131,8 +131,8 @@ class GenomeReference:
         :return: tuple of sequence string and id in db
         """
 
-        if cls.sequence is None:
-            raise Exception("No sequence available")
+        # if cls.sequence is None:
+        #     raise Exception("No sequence available")
 
         return cls.sequence, cls.sequence_id
 
