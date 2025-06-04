@@ -34,7 +34,6 @@ class GenomeReference:
 
         :param sequence_data: a dictionary with at least 'orgname', 'length', and 'sequence' fields
         """
-
         # populate to singleton instance's variables
         cls.sequence_id = sequence_data['id']
         cls.name = sequence_data['orgname']
@@ -69,11 +68,10 @@ class GenomeReference:
 
         # save to database
         sequence_record = Sequence.objects.create(**sequence_data)
-
         # populate to singleton instance's variables
         cls._populate_variables({
             **sequence_data,
-            id: sequence_record.id,
+            'id': sequence_record.id,
         })
 
 
@@ -113,6 +111,9 @@ class GenomeReference:
         Load sequence data into memory from the local DB, or start remote query if no such file exists
         """
 
+        if cls.sequence_id:
+            return
+
         try:
             print("Loading reference sequence from local DB")
             cls._load_from_db()
@@ -130,9 +131,8 @@ class GenomeReference:
 
         :return: tuple of sequence string and id in db
         """
-
-        # if cls.sequence is None:
-        #     raise Exception("No sequence available")
+        if cls.sequence is None:
+            cls._load_from_db()
 
         return cls.sequence, cls.sequence_id
 

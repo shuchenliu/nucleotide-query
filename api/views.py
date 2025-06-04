@@ -14,7 +14,11 @@ import re2 as re
 class QueryView(APIView):
     parser_classes = [JSONParser]
 
-    sequence, sequence_id = GenomeReference.get()
+    sequence_id = None
+    sequence = None
+
+    def initial(self, request, *args, **kwargs):
+        self.sequence, self.sequence_id = GenomeReference.get()
 
     def post(self, request):
 
