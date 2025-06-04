@@ -1,5 +1,6 @@
 import uuid
 
+from django.db import transaction
 from rest_framework import status
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.parsers import JSONParser
@@ -36,21 +37,25 @@ class QueryView(APIView):
         #  1. cache layer redis
         #  2. celery for delayed db writes
         #  3. pagination
-        #  4. add atomic
 
         pattern = serializer.validated_data['pattern']
 
         try:
             search_term = SearchTerm.objects.get(pattern=pattern)
         except SearchTerm.DoesNotExist:
+            search_term = self.process_search_term(pattern)
 
+        return self.prepare_response(search_term)
+
+
+    def process_search_term(self, pattern):
+        with transaction.atomic():
             # create SearchTerm record
             search_term = SearchTerm(pattern=pattern, sequence_id=self.sequence_id)
             search_term.save()
 
             # bulk saving to db in batch:
             for batch in self.get_match_stream(pattern):
-
                 # calculate ids
                 match_ids = [
                     self.compute_match_id(start, end)
@@ -67,9 +72,7 @@ class QueryView(APIView):
 
                 # add many-to-many relationships to search_term
                 search_term.matches.add(*match_ids)
-
-        return self.prepare_response(search_term)
-
+        return search_term
 
     def prepare_response(self, search_term: SearchTerm):
         matches = search_term.matches.all()
