@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from api.genome.reference import GenomeReference
 from api.models import SearchTerm, Match
 from api.serializers import SearchTermSerializer, MatchSerializer
+from api.views.query.pagination import QueryPagination
 
 
 class QueryView(APIView):
@@ -35,7 +36,6 @@ class QueryView(APIView):
         # todo:
         #  1. cache layer redis
         #  2. celery for delayed db writes
-        #  3. pagination
 
         pattern = serializer.validated_data['pattern']
 
@@ -80,8 +80,13 @@ class QueryView(APIView):
                 "details": "No matches found",
             }, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = MatchSerializer(matches, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        pagination = QueryPagination()
+        page = pagination.paginate_queryset(matches, self.request, view=self)
+
+        serializer = MatchSerializer(page, many=True)
+        # return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return pagination.get_paginated_response(serializer.data)
 
 
 
