@@ -1,6 +1,6 @@
 from django.urls import path
 
-from api.views import QueryView, SequenceListView, SequenceDetailView
+from api.views.views import QueryView, SequenceListView, SequenceDetailView
 
 urlpatterns = [
     path('query/', QueryView.as_view(), name='query'),
