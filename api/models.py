@@ -40,13 +40,17 @@ class Match(models.Model):
 
     Matches are associated with one or more SearchTerms through a many-to-many relationship.
     """
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, editable=False)
     start = models.IntegerField()
     end = models.IntegerField()
     sequence = models.ForeignKey(Sequence, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['start', 'end']
+
+        indexes = [
+            models.Index(fields=["start", "end", "sequence"]),
+        ]
 
         # we want to avoid storing repeated matched sequence
         constraints = [
