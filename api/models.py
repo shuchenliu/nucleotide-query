@@ -81,7 +81,7 @@ class Search(models.Model):
     Might be good for class-based views with standard CRUD ops, mostly just listing
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    search_term = models.ForeignKey(SearchTerm, on_delete=models.CASCADE)
+    search_term = models.ForeignKey(SearchTerm, on_delete=models.CASCADE, related_name='search')
     created_at = models.DateTimeField(default=timezone.now, editable=False, db_index=True)
 
     class Meta:

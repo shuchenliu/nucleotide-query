@@ -28,13 +28,21 @@ class SearchTermSerializer(serializers.ModelSerializer):
         fields = ['id', 'pattern']
 
 
+class SearchTermFrequencySerializer(serializers.ModelSerializer):
+    count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = SearchTerm
+        fields = ['id', 'pattern', 'count']
+
+
+
 class SearchSerializer(serializers.ModelSerializer):
     pattern = serializers.CharField(source='search_term.pattern', read_only=True)
 
     class Meta:
         model = Search
         fields = ['id', 'pattern', 'created_at']
-
 
 
 class SequenceListSerializer(serializers.ModelSerializer):
