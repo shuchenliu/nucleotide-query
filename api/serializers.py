@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from api.models import Match, SearchTerm, Sequence
+from api.models import Match, SearchTerm, Sequence, Search
 from api.validators import validate_search_pattern
 
 
@@ -26,6 +26,15 @@ class SearchTermSerializer(serializers.ModelSerializer):
     class Meta:
         model = SearchTerm
         fields = ['id', 'pattern']
+
+
+class SearchSerializer(serializers.ModelSerializer):
+    pattern = serializers.CharField(source='search_term.pattern', read_only=True)
+
+    class Meta:
+        model = Search
+        fields = ['id', 'pattern', 'created_at']
+
 
 
 class SequenceListSerializer(serializers.ModelSerializer):
