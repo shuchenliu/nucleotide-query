@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.genome.reference import GenomeReference
-from api.models import SearchTerm, Match
+from api.models import SearchTerm, Match, Search
 from api.serializers import SearchTermSerializer, MatchSerializer
 from api.views.query.pagination import QueryPagination
 
@@ -50,8 +50,8 @@ class QueryView(APIView):
     def process_search_term(self, pattern):
         with transaction.atomic():
             # create SearchTerm record
-            search_term = SearchTerm(pattern=pattern, sequence_id=self.sequence_id)
-            search_term.save()
+            search_term = SearchTerm.objects.create(pattern=pattern, sequence_id=self.sequence_id)
+            search = Search.objects.create(search_term=search_term)
 
             # bulk saving to db in batch:
             for batch in self.get_match_stream(pattern):
