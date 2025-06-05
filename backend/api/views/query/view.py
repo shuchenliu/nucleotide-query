@@ -2,6 +2,8 @@ import uuid
 
 import re2 as re
 from django.db import transaction
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
@@ -13,6 +15,9 @@ from api.serializers import SearchTermSerializer, MatchSerializer
 from api.views.query.pagination import QueryPagination
 
 
+# todo:
+# 2. celery for delayed db writes
+
 class QueryView(APIView):
     parser_classes = [JSONParser]
 
@@ -22,8 +27,10 @@ class QueryView(APIView):
     def initial(self, request, *args, **kwargs):
         self.sequence, self.sequence_id = GenomeReference.get()
 
+    # match results almost never changes so doing infinite timeout should be ok,
+    # with LRU policy explicitly set on Redis. With that said, allowing 2 hrs here just to be safe
+    @method_decorator(cache_page(60 * 60 * 24, key_prefix='query'))
     def get(self, request):
-
         # use serializer to conduct validation
         serializer = SearchTermSerializer(data=request.query_params)
         # handle invalid requests
@@ -32,9 +39,6 @@ class QueryView(APIView):
 
 
         # Try match with db
-        # todo:
-        #  1. cache layer redis
-        #  2. celery for delayed db writes
 
         pattern = serializer.validated_data['pattern']
 
