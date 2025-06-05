@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Count, OuterRef, Subquery, Max
 from rest_framework.generics import ListAPIView
 
 from api.models import Search, SearchTerm
@@ -8,8 +8,24 @@ from api.serializers import SearchSerializer, SearchTermFrequencySerializer
 class RecentSearchView(ListAPIView):
     recent_size = 10
 
-    # fetch most recent 10 searches
-    queryset = Search.objects.select_related('search_term').order_by('-created_at')[:recent_size]
+    # fetch most recent 10 unique searches
+    def get_queryset(self):
+
+        # Use subquery to fetch distinct id only
+        id_groups = (
+            Search.objects.values('search_term')
+            .annotate(latest_id=Max('id'))
+            .values('latest_id')
+        )
+
+        queryset = (
+            Search.objects.filter(id__in=Subquery(id_groups))
+            .select_related('search_term')
+            .order_by('-created_at')
+        )
+
+        return queryset[:self.recent_size]
+
     serializer_class = SearchSerializer
 
 class FrequencySearchView(ListAPIView):
