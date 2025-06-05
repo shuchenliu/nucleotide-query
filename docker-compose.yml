@@ -15,6 +15,8 @@ services:
 #      - media_volume:/app/media
     depends_on:
       - redis
+    environment:
+      - DJANGO_ENV=${DJANGO_ENV}
 
   nginx:
     image: nginx:alpine
