@@ -22,11 +22,10 @@ class QueryView(APIView):
     def initial(self, request, *args, **kwargs):
         self.sequence, self.sequence_id = GenomeReference.get()
 
-    def post(self, request):
+    def get(self, request):
 
         # use serializer to conduct validation
-        serializer = SearchTermSerializer(data=request.data)
-
+        serializer = SearchTermSerializer(data=request.query_params)
         # handle invalid requests
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
