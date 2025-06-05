@@ -71,7 +71,7 @@ class QueryView(APIView):
         cache.set(cache_key, {
             "search_term_id": search_term.id,
             "response": paginated_response.data,
-        })
+        }, timeout=60 * 60 * 24)
 
         return paginated_response
 
