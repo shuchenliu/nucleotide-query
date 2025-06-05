@@ -44,6 +44,13 @@ class QueryView(APIView):
         except SearchTerm.DoesNotExist:
             search_term = self.process_search_term(pattern)
 
+        # save initial search actions
+        # maybe we can get more fine-grained control using session
+        # but for this project excluding queries using page param should do it
+
+        if 'page' not in request.query_params:
+            Search.objects.create(search_term=search_term)
+
         return self.prepare_response(search_term)
 
 
@@ -51,7 +58,6 @@ class QueryView(APIView):
         with transaction.atomic():
             # create SearchTerm record
             search_term = SearchTerm.objects.create(pattern=pattern, sequence_id=self.sequence_id)
-            search = Search.objects.create(search_term=search_term)
 
             # bulk saving to db in batch:
             for batch in self.get_match_stream(pattern):
