@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:7
+    command: [ "redis-server", "--maxmemory-policy", "allkeys-lru" ]
+
+  backend:
+    build:
+      context: backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/db.sqlite3:/app/db.sqlite3
+      - ./backend:/app
+#      - static_volume:/app/static
+#      - media_volume:/app/media
+    depends_on:
+      - redis
