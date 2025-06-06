@@ -13,3 +13,13 @@ export type Result = {
   current_page: number;
   page_size: 10;
 };
+
+export type Payload =
+  | {
+      pattern: string;
+      page_size?: string;
+      page?: string;
+    }
+  | {
+      url: string;
+    };

@@ -1,16 +1,44 @@
-import type { Result } from '../types/result.ts';
+import type { Payload, Result } from '../types/result.ts';
 import Location from './Location.tsx';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import type { UseMutateFunction } from '@tanstack/react-query';
+import NavigatorLink from './NavigatorLink.tsx';
 
-function Results({ data, sequence }: { data: Result; sequence: string }) {
-  if (!data) {
+function Results({
+  data,
+  sequence,
+  mutate,
+}: {
+  data: Result;
+  sequence: string;
+  mutate: UseMutateFunction<any, Error, Payload, unknown>;
+}) {
+  const [displayData, setDisplayData] = useState<Result | null>(data);
+
+  useEffect(() => {
+    if (data) {
+      setDisplayData(data);
+    }
+  }, [data]);
+
+  const indexStart = useMemo(() => {
+    if (!displayData) {
+      return -1;
+    }
+    return (displayData.current_page - 1) * displayData.page_size + 1;
+  }, [displayData]);
+
+  if (!displayData) {
     return null;
   }
 
-  const indexStart = useMemo(
-    () => (data.current_page - 1) * data.page_size + 1,
-    [data.page_size, data.current_page],
-  );
+  const navigate = (url?: string) => () => {
+    if (url) {
+      mutate({
+        url,
+      });
+    }
+  };
 
   return (
     <div>
@@ -30,7 +58,7 @@ function Results({ data, sequence }: { data: Result; sequence: string }) {
       <div
         className={'w-full bg-gray-100 shadow-md rounded-xl overflow-hidden'}
       >
-        {data.results.map(({ start, end }, index) => (
+        {displayData.results.map(({ start, end }, index) => (
           <div
             key={'match' + index}
             className={`flex flex-row items-center justify-between h-10 w-full  ${
@@ -51,11 +79,25 @@ function Results({ data, sequence }: { data: Result; sequence: string }) {
         ))}
       </div>
 
-      <div>
-        <div className={'pt-8'}>
-          showing {indexStart} - {indexStart + data.results.length} {' of '}{' '}
-          {data.count} {data.count === 1 ? 'match' : 'matches'}
-        </div>
+      <div
+        className={
+          'w-full px-10 flex flex-row items-center justify-between mt-5'
+        }
+      >
+        {['previous', 'next'].map((key) => (
+          <NavigatorLink
+            key={key}
+            navigate={navigate}
+            url={displayData[key as keyof typeof displayData] as string}
+            text={key.slice(0, 4)}
+          />
+        ))}
+      </div>
+
+      <div className={'pt-8'}>
+        showing {indexStart} - {indexStart + displayData.results.length - 1}{' '}
+        {' of '} {displayData.count}{' '}
+        {displayData.count === 1 ? 'match' : 'matches'}
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import type { UseMutateFunction } from '@tanstack/react-query';
+import type { Payload } from '../types/result.ts';
 
 function SearchButton({
   pattern,
@@ -7,11 +8,11 @@ function SearchButton({
 }: {
   pattern?: string;
   nucId?: string;
-  mutate: UseMutateFunction<any, Error, string, unknown>;
+  mutate: UseMutateFunction<any, Error, Payload, unknown>;
 }) {
   const onClick = () => {
     if (pattern) {
-      mutate(pattern);
+      mutate({ pattern });
     }
   };
 
