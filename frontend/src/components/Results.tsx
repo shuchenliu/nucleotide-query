@@ -4,14 +4,34 @@ import { useEffect, useMemo, useState } from 'react';
 import type { UseMutateFunction } from '@tanstack/react-query';
 import NavigatorLink from './NavigatorLink.tsx';
 
+function getPageList(current: number, total: number): number[] {
+  const pageCount = Math.min(5, total);
+  let start = Math.max(1, current - 2);
+  let end = start + pageCount - 1;
+
+  if (end > total) {
+    end = total;
+    start = Math.max(1, end - pageCount + 1);
+  }
+
+  const pages: number[] = [];
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+
+  return pages;
+}
+
 function Results({
   data,
   sequence,
   mutate,
+  pattern,
 }: {
   data: Result;
   sequence: string;
   mutate: UseMutateFunction<any, Error, Payload, unknown>;
+  pattern?: string | null;
 }) {
   const [displayData, setDisplayData] = useState<Result | null>(data);
 
@@ -28,17 +48,36 @@ function Results({
     return (displayData.current_page - 1) * displayData.page_size + 1;
   }, [displayData]);
 
+  const pagelist = useMemo(() => {
+    if (!displayData) {
+      return [-1];
+    }
+
+    return getPageList(displayData.current_page, displayData.total_pages);
+  }, [displayData]);
+
   if (!displayData) {
     return null;
   }
 
   const navigate = (url?: string) => () => {
+    console.log(url);
+
     if (url) {
       mutate({
         url,
       });
     }
   };
+
+  const navigateToPage =
+    (pattern: string, pageSize: string, page: string) => () => {
+      mutate({
+        pattern,
+        page_size: pageSize,
+        page,
+      });
+    };
 
   return (
     <div>
@@ -84,14 +123,33 @@ function Results({
           'w-full px-10 flex flex-row items-center justify-between mt-5'
         }
       >
-        {['previous', 'next'].map((key) => (
-          <NavigatorLink
-            key={key}
-            navigate={navigate}
-            url={displayData[key as keyof typeof displayData] as string}
-            text={key.slice(0, 4)}
-          />
-        ))}
+        {['previous', ...pagelist, 'next'].map((key) => {
+          if (typeof key === 'string') {
+            return (
+              <NavigatorLink
+                key={key}
+                navigate={navigate(
+                  displayData[key as keyof typeof displayData] as string,
+                )}
+                canNavigate={!!displayData[key as keyof typeof displayData]}
+                text={key.slice(0, 4)}
+              />
+            );
+          }
+
+          return (
+            <NavigatorLink
+              key={'pagelink' + key}
+              navigate={navigateToPage(
+                pattern!,
+                displayData?.page_size + '',
+                key + '',
+              )}
+              canNavigate={key != displayData.current_page}
+              text={key + ''}
+            />
+          );
+        })}
       </div>
 
       <div className={'pt-8'}>

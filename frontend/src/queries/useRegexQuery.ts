@@ -8,25 +8,26 @@ export const useRegexQuery = () =>
       // validate pattern
 
       let res;
+      let params;
       if ('url' in payload) {
+        params = new URLSearchParams(payload.url);
         res = await fetch(payload.url);
       } else {
-        const params = new URLSearchParams({
+        params = new URLSearchParams({
           page_size: '10',
           ...payload,
         });
+
+        console.log(params.toString());
+
         res = await fetch(ENDPOINTS.QUERY + '?' + params.toString());
       }
 
-      return await res.json();
-    },
-  });
+      const data = await res.json();
 
-export const useNavigate = () =>
-  useMutation({
-    mutationFn: async (url: string) => {
-      // validate pattern
-      const res = await fetch(url);
-      return await res.json();
+      return {
+        data,
+        pattern: params.get('pattern'),
+      };
     },
   });

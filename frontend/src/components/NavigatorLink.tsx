@@ -1,20 +1,20 @@
 function NavigatorLink({
+  canNavigate,
   text,
-  url,
   navigate,
 }: {
   text: string;
-  url?: string;
-  navigate: (url?: string) => () => void;
+  canNavigate: boolean;
+  navigate: () => unknown;
 }) {
   return (
     <a
-      className={`underline ${
-        !url
-          ? 'opacity-50 pointer-events-none cursor-default'
-          : 'cursor-pointer'
+      className={`${
+        !canNavigate
+          ? 'opacity-20 pointer-events-none cursor-default'
+          : 'cursor-pointer underline'
       }`}
-      onClick={navigate(url)}
+      onClick={navigate}
     >
       {text}
     </a>

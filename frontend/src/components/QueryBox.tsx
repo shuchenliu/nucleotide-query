@@ -32,7 +32,12 @@ function QueryBox() {
         />
         <SearchButton pattern={pattern} nucId={selected} mutate={mutate} />
       </div>
-      <Results data={data} sequence={sequence.sequence} mutate={mutate} />
+      <Results
+        data={data?.data}
+        sequence={sequence.sequence}
+        mutate={mutate}
+        pattern={data?.pattern}
+      />
     </div>
   );
 }
