@@ -18,8 +18,6 @@ export const useRegexQuery = () =>
           ...payload,
         });
 
-        console.log(params.toString());
-
         res = await fetch(ENDPOINTS.QUERY + '?' + params.toString());
       }
 

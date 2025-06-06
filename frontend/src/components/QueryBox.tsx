@@ -5,15 +5,21 @@ import SearchButton from './SearchButton.tsx';
 import * as React from 'react';
 import { useRegexQuery } from '../queries/useRegexQuery.ts';
 import Results from './Results.tsx';
+import PageSizeSelect from './PageSizeSelect.tsx';
 
 function QueryBox() {
   const sequence = useContext(sequenceContext);
 
   const [selected, setSelected] = useState<string>();
+  const [selectedPageSize, setSelectedPageSize] = useState<string>();
   const [pattern, setPattern] = useState<string>();
 
   const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelected(e.target.value);
+  };
+
+  const handlePageSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedPageSize(e.target.value);
   };
 
   const handInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,7 +36,13 @@ function QueryBox() {
           handleSelect={handleSelect}
           handleInput={handInput}
         />
-        <SearchButton pattern={pattern} nucId={selected} mutate={mutate} />
+        <PageSizeSelect handleSelect={handlePageSelect} />
+        <SearchButton
+          pattern={pattern}
+          nucId={selected}
+          mutate={mutate}
+          pageSize={selectedPageSize}
+        />
       </div>
       <Results
         data={data?.data}

@@ -5,14 +5,16 @@ function SearchButton({
   pattern,
   nucId,
   mutate,
+  pageSize,
 }: {
   pattern?: string;
   nucId?: string;
+  pageSize?: string;
   mutate: UseMutateFunction<any, Error, Payload, unknown>;
 }) {
   const onClick = () => {
     if (pattern) {
-      mutate({ pattern });
+      mutate({ pattern, page_size: pageSize });
     }
   };
 
