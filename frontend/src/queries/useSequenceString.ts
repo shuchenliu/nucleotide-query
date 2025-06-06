@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { SeqDetail, SeqInfo } from '../types/sequence.ts';
 
 export const useSequenceString = () =>
-  useQuery<SeqDetail>({
+  useQuery<SeqDetail & SeqInfo>({
     queryKey: ['sequence-string'],
     queryFn: async () => {
       const res = await fetch('/api/sequence/');
@@ -11,6 +11,9 @@ export const useSequenceString = () =>
 
       const sequenceResponse = await fetch(`/api/sequence/${seqInfo.id}`);
       const data: SeqDetail = await sequenceResponse.json();
-      return data;
+      return {
+        ...data,
+        ...seqInfo,
+      };
     },
   });
