@@ -33,6 +33,10 @@ def eject_from_cache(query_type: str) -> None:
     cache.delete(key)
 
 
+def invalidate_recent_search_cache() -> None:
+    eject_from_cache(RECENT_SEARCH)
+
+
 def cache_response(query_type: str, timeout: int = 60 * 60):
     def decorator(view_method):
         @wraps(view_method)
