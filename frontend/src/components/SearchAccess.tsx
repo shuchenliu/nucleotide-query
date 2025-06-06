@@ -15,7 +15,7 @@ function SearchAccess({
   text: string;
   sideEffect?: any;
 }) {
-  if (!searchArray) {
+  if (!searchArray || searchArray.length === 0) {
     return null;
   }
 
