@@ -3,6 +3,7 @@ import Location from './Location.tsx';
 import { useEffect, useMemo, useState } from 'react';
 import type { UseMutateFunction } from '@tanstack/react-query';
 import NavigatorLink from './NavigatorLink.tsx';
+import { navigate, navigateToPage } from '../actions/navigate.ts';
 
 function getPageList(current: number, total: number): number[] {
   const pageCount = Math.min(5, total);
@@ -60,23 +61,6 @@ function Results({
     return null;
   }
 
-  const navigate = (url?: string) => () => {
-    if (url) {
-      mutate({
-        url,
-      });
-    }
-  };
-
-  const navigateToPage =
-    (pattern: string, pageSize: string, page: string) => () => {
-      mutate({
-        pattern,
-        page_size: pageSize,
-        page,
-      });
-    };
-
   return (
     <div>
       <div className={'w-full flex flex-row items-center justify-between h-10'}>
@@ -123,6 +107,7 @@ function Results({
       >
         <NavigatorLink
           navigate={navigateToPage(
+            mutate,
             pattern!,
             displayData?.page_size + '',
             1 + '',
@@ -137,6 +122,7 @@ function Results({
               <NavigatorLink
                 key={key}
                 navigate={navigate(
+                  mutate,
                   displayData[key as keyof typeof displayData] as string,
                 )}
                 canNavigate={!!displayData[key as keyof typeof displayData]}
@@ -149,6 +135,7 @@ function Results({
             <NavigatorLink
               key={'pagelink' + key}
               navigate={navigateToPage(
+                mutate,
                 pattern!,
                 displayData?.page_size + '',
                 key + '',
@@ -161,6 +148,7 @@ function Results({
 
         <NavigatorLink
           navigate={navigateToPage(
+            mutate,
             pattern!,
             displayData?.page_size + '',
             displayData.total_pages + '',

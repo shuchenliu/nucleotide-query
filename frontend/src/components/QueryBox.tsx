@@ -6,6 +6,12 @@ import * as React from 'react';
 import { useRegexQuery } from '../queries/useRegexQuery.ts';
 import Results from './Results.tsx';
 import PageSizeSelect from './PageSizeSelect.tsx';
+import {
+  useFrequentSearch,
+  useRecentSearch,
+} from '../queries/useSearchQuery.ts';
+
+import SearchAccess from './SearchAccess.tsx';
 
 function QueryBox() {
   const sequence = useContext(sequenceContext);
@@ -13,6 +19,9 @@ function QueryBox() {
   const [selected, setSelected] = useState<string>();
   const [selectedPageSize, setSelectedPageSize] = useState<string>();
   const [pattern, setPattern] = useState<string>();
+
+  const { data: recentSearch } = useRecentSearch();
+  const { data: frequentSearch } = useFrequentSearch();
 
   const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelected(e.target.value);
@@ -30,11 +39,13 @@ function QueryBox() {
 
   return (
     <div>
-      <div className={'py-10 flex flex-row items-baseline'}>
+      <div className={'py-5 flex flex-row items-baseline'}>
         <Search
+          pattern={pattern}
           seq={sequence}
           handleSelect={handleSelect}
           handleInput={handInput}
+          seqSelect={selected}
         />
         <PageSizeSelect handleSelect={handlePageSelect} />
         <SearchButton
@@ -44,6 +55,20 @@ function QueryBox() {
           pageSize={selectedPageSize}
         />
       </div>
+      <SearchAccess
+        text={'recent searches'}
+        mutate={mutate}
+        searchArray={recentSearch}
+        pageSize={selectedPageSize}
+        sideEffect={setPattern}
+      />
+      <SearchAccess
+        text={'most frequent searches'}
+        mutate={mutate}
+        searchArray={frequentSearch}
+        pageSize={selectedPageSize}
+        sideEffect={setPattern}
+      />
       <Results
         data={data?.data}
         sequence={sequence.sequence}
