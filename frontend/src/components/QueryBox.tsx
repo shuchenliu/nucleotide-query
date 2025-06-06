@@ -35,7 +35,7 @@ function QueryBox() {
     setPattern(e.target.value);
   };
 
-  const { data, mutate } = useRegexQuery();
+  const { data, mutate, isError, error } = useRegexQuery();
 
   return (
     <div>
@@ -69,12 +69,22 @@ function QueryBox() {
         pageSize={selectedPageSize}
         sideEffect={setPattern}
       />
-      <Results
-        data={data?.data}
-        sequence={sequence.sequence}
-        mutate={mutate}
-        pattern={data?.pattern}
-      />
+      {isError ? (
+        <div className={'h-60 w-full flex justify-center items-center'}>
+          <p className={'text-2xl'}>
+            {error.message == '404'
+              ? 'No match found'
+              : 'Something wrong. Please try again.'}
+          </p>
+        </div>
+      ) : (
+        <Results
+          data={data?.data}
+          sequence={sequence.sequence}
+          mutate={mutate}
+          pattern={data?.pattern}
+        />
+      )}
     </div>
   );
 }

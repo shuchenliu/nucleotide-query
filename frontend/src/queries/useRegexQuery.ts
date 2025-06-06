@@ -21,6 +21,11 @@ export const useRegexQuery = () =>
         res = await fetch(ENDPOINTS.QUERY + '?' + params.toString());
       }
 
+      if (!res.ok) {
+        // throws an error that will be caught by react-query
+        throw new Error(`${res.status}`);
+      }
+
       const data = await res.json();
 
       return {

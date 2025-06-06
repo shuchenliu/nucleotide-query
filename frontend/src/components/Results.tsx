@@ -79,7 +79,7 @@ function Results({
       <div
         className={'w-full bg-gray-100 shadow-md rounded-xl overflow-hidden'}
       >
-        {displayData.results.map(({ start, end }, index) => (
+        {displayData?.results.map(({ start, end }, index) => (
           <div
             key={'match' + index}
             className={`flex flex-row items-center justify-between h-10 w-full  ${
