@@ -123,6 +123,16 @@ function Results({
           'w-full px-10 flex flex-row items-center justify-between mt-5'
         }
       >
+        <NavigatorLink
+          navigate={navigateToPage(
+            pattern!,
+            displayData?.page_size + '',
+            1 + '',
+          )}
+          canNavigate={1 !== displayData.current_page}
+          text={'first'}
+        />
+
         {['previous', ...pagelist, 'next'].map((key) => {
           if (typeof key === 'string') {
             return (
@@ -145,11 +155,21 @@ function Results({
                 displayData?.page_size + '',
                 key + '',
               )}
-              canNavigate={key != displayData.current_page}
+              canNavigate={key !== displayData.current_page}
               text={key + ''}
             />
           );
         })}
+
+        <NavigatorLink
+          navigate={navigateToPage(
+            pattern!,
+            displayData?.page_size + '',
+            displayData.total_pages + '',
+          )}
+          canNavigate={displayData.total_pages !== displayData.current_page}
+          text={'last'}
+        />
       </div>
 
       <div className={'pt-8'}>
