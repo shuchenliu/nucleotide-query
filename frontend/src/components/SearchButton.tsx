@@ -1,7 +1,27 @@
-function SearchButton() {
+import type { UseMutateFunction } from '@tanstack/react-query';
+
+function SearchButton({
+  pattern,
+  nucId,
+  mutate,
+}: {
+  pattern?: string;
+  nucId?: string;
+  mutate: UseMutateFunction<any, Error, string, unknown>;
+}) {
+  const onClick = () => {
+    if (pattern) {
+      mutate(pattern);
+    }
+  };
+
   return (
     <div className={'ml-3'}>
-      <button className="h-16 w-30 bg-blue-200 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center justify-center">
+      <button
+        onClick={onClick}
+        disabled={!pattern || !nucId}
+        className="h-16 w-30 disabled:bg-gray-200 bg-blue-200 hover:bg-blue-100 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center justify-center"
+      >
         <span>GO</span>
       </button>
     </div>
