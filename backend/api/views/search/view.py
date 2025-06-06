@@ -1,12 +1,13 @@
-from django.db.models import Count, OuterRef, Subquery, Max
+from django.db.models import Count, Subquery, Max
 from rest_framework.generics import ListAPIView
 
 from api.models import Search, SearchTerm
 from api.serializers import SearchSerializer, SearchTermFrequencySerializer
-
+from api.views.search.search_cache_management import  RECENT_SEARCH, cache_response
 
 class RecentSearchView(ListAPIView):
     recent_size = 10
+    serializer_class = SearchSerializer
 
     # fetch most recent 10 unique searches
     def get_queryset(self):
@@ -26,7 +27,10 @@ class RecentSearchView(ListAPIView):
 
         return queryset[:self.recent_size]
 
-    serializer_class = SearchSerializer
+    @cache_response(query_type=RECENT_SEARCH)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class FrequencySearchView(ListAPIView):
     recent_size = 10

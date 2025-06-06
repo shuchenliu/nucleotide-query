@@ -1,6 +1,6 @@
 from django.urls import path
 
-from api.views.search import RecentSearchView, FrequencySearchView
+from api.views.search.view import RecentSearchView, FrequencySearchView
 from api.views.sequence import SequenceListView, SequenceDetailView
 from api.views.query.view import QueryView
 
