@@ -61,8 +61,6 @@ function Results({
   }
 
   const navigate = (url?: string) => () => {
-    console.log(url);
-
     if (url) {
       mutate({
         url,

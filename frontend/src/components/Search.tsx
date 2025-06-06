@@ -15,7 +15,7 @@ export default function Search({
   return (
     <div>
       <div className="mt-2">
-        <div className="h-16 w-120 flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-blue-600">
+        <div className="h-12 w-120 flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 has-[input:focus-within]:outline-2 has-[input:focus-within]:-outline-offset-2 has-[input:focus-within]:outline-blue-600">
           <input
             id="price"
             name="price"
@@ -29,7 +29,7 @@ export default function Search({
               id="nucleotide"
               name="nucleotide"
               aria-label="nucleotide"
-              className="h-16 bg-gray-100 col-start-1 row-start-1 w-full appearance-none rounded-md py-1.5 pr-7 pl-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 sm:text-sm/6"
+              className="h-12 bg-gray-100 col-start-1 row-start-1 w-full appearance-none rounded-md py-1.5 pr-7 pl-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-600 sm:text-sm/6"
               onChange={handleSelect}
             >
               <option selected disabled hidden>
