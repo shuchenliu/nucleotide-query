@@ -13,3 +13,5 @@
 
 # dev scripts
 test_**.py
+
+*.xml
