@@ -18,6 +18,18 @@ services:
     environment:
       - DJANGO_ENV=${DJANGO_ENV}
 
+# dev only for now
+  frontend:
+    build:
+      context: frontend
+    # for hot reloading
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    expose:
+      - "5173"
+    command: ["npm", "run", "dev"]
+
   nginx:
     image: nginx:alpine
     ports:
@@ -28,3 +40,4 @@ services:
 #      - media_volume:/var/www/media
     depends_on:
       - backend
+      - frontend
